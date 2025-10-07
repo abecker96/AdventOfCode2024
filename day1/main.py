@@ -24,3 +24,5 @@ with open("input.txt") as file:
         total_value += difference
 
     print(total_value)
+
+# Answer 1660292 was correct
