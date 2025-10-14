@@ -1,26 +1,5 @@
 import re
 
-
-startString = "mul("
-endString = ")"
-sep = ","
-maxDigits = 3
-
-def parseDigits(string):
-    intString = ""
-    while(string[0].isdigit()):
-        intString += string[0]
-        string = string[1:]
-
-    if(len(intString) > maxDigits):
-        # digits too long
-        return -1
-    elif(len(intString) == 0):
-        # not enough digits
-        return -1
-    else:
-        return int(intString)
-
 def main():
     """Main function
     Takes no arguments. Returns no errors. Unless sysio does something really fucky"""
@@ -29,40 +8,28 @@ def main():
     # This could error out if the file isn't found
     # In that case, there isn't a rest of the program to run anyways
     # So no point trying to catch it
-    with open("test_input.txt") as file:
+    with open("input.txt") as file:
         do_str = "do()"
         dont_str = "don't()"
 
+        # File starts with an enabled section, strip that out first
+        enabled = True  # Make sure to remember enabled status between lines
         for line in file:
-            # File starts with an enabled section, strip that out first
-            enabled = True
             do_section = ""
-            dont_section = ""
 
             while(len(line)):
+                # There are far more efficient ways to do this than constant string splicing
+                # This is fast enough for right now though. If anybody else were to run this
+                # on worse hardware, or on larger datasets, this would be a prime section
+                # for optimization
+                if((line.startswith(do_str) and not enabled) or 
+                   (line.startswith(dont_str) and enabled)):
+                    enabled = not enabled
+                
                 if(enabled):
-                    search_str = dont_str
-                    index = line.find(dont_str)
-                    if(index == -1):
-                        break
-                    do_section += line[:index]
-                    print(f"Do: {do_section}")
-                    print(f"Dont: {dont_section}")
-                else:
-                    search_str = do_str
-                    index = line.find(do_str)
-                    if(index == -1):
-                        break
-                    dont_section += line[:index]
-                    print(f"Do: {do_section}")
-                    print(f"Dont: {dont_section}")
-
-                line = line[index:]
-                enabled = not enabled
-
-
-            
-            print(f"Final do: {do_section}")
+                    do_section += line[:1]
+                line = line[1:]
+                    
             # Match any occurrence of the term "mul(d,d)"
             # Where 'd' is 1-3 decimal digits, s.t. the 
             # first digit is not 0
