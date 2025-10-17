@@ -1,21 +1,46 @@
 # Problem statement: 
 
 
-def update_valid(rules, update : list):
-    # Check each number in the list
+def update_valid(rule_dict : dict, update : list):
     for i in range(len(update)):
-        # Against all of the numbers after it in the list
+        # If a rule doesn't exist enforcing an ordering
+        # for this number, it can't be invalid
+        if not(update[i] in rule_dict):
+            continue
+
+        # Check each number against all of the numbers after it in the list
         for j in range(len(update) - i - 1):
-            # If a rule exists where
-            for rule in rules:
-                # update[i] must come after a number which exists in the
-                # latter part of the update
-                if update[i] == rule[1] and update[1 + i + j] == rule[0]:
-                    # Then that is a rule violation
+            # If a rule exists where update[i] must come after another number
+            # Check to see if any of those numbers exist in the
+            # latter part of the update
+            for rule in rule_dict[update[i]]:
+                if update[1 + i + j] == rule:
+                    # Rule violation, no point checking the rest of the list
                     return False
+                
     # No invalid orderings found
     return True
 
+def generate_rule_dict(rules):
+    rule_dict = {}
+    for i in range(len(rules)):
+        key = rules[i][1]
+        if(key in rule_dict):
+            # Don't make duplicate mappings
+            continue
+        
+        # Generate a list of all numbers that must come
+        # before this one in an update
+        ruleset = []
+        for rule in rules:
+            if key == rule[1]:
+                ruleset.append(rule[0])
+        
+        # Save that in the return dict
+        rule_dict[key] = ruleset
+
+    return rule_dict
+        
 
 def main():
     """Main function
@@ -41,13 +66,15 @@ def main():
                 vals = line.strip().split(",")
                 updates.append([int(val) for val in vals])
 
+    rule_dict = generate_rule_dict(rules)
+
     for update in updates:
-        if(update_valid(rules, update)):
+        if(update_valid(rule_dict, update)):
+            # Add midpoint of a valid update to the total
             count += update[len(update)//2]
 
     print(count)
 
-        
 if __name__ == "__main__":
     main()
 
