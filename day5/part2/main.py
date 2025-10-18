@@ -40,7 +40,7 @@ def generate_rule_dict(rules):
 
     return rule_dict
         
-def fix_ordering(rule_dict : dict, update : list, it = 0):
+def fix_ordering(rule_dict : dict, update : list):
     # This is probably the least efficient solution possible.
 
     for i in range(len(update)):
@@ -55,11 +55,12 @@ def fix_ordering(rule_dict : dict, update : list, it = 0):
             # Check to see if any of those numbers exist in the
             # latter part of the update
             for rule in rule_dict[update[i]]:
-                if update[1 + i + j] == rule:
-                    # Swap these two elements
-                    update[i], update[1 + i + j] = update[1 + i + j], update[i]
-                    # Return another attempt at fixing it
-                    return fix_ordering(rule_dict, update, it+1)
+                check_index = 1 + i + j
+                if update[check_index] == rule:
+                    # Move the offending element to be right before the current one
+                    val = update[check_index]
+                    del update[check_index]
+                    update.insert(i, val)
                 
     # No invalid orderings found
     return update
