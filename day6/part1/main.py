@@ -1,5 +1,4 @@
 import time
-import math
 
 DIR_CLOCKWISE = 0
 DIR_COUNTERCLOCKWISE = 1
